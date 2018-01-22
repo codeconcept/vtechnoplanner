@@ -32,7 +32,8 @@ const technoSchema = mongoose.Schema({
     details: String,
     dateStudy: Date,
     dateCreation: Date,
-    timeSpentStudying: String
+    timeSpentStudying: String,
+    isPrioritary: Boolean
 });
 const Techno = mongoose.model('Techno', technoSchema);
 
@@ -51,20 +52,44 @@ app.get('/technos', (req, res) => {
             res.json(technos);
         }
     });
-})
+});
+
+app.get('/techno/:technoid', (req, res) => {
+    const technoId = req.params.technoid;
+    Techno.findById(technoId, (err, techno)=>{
+        if(err) {
+            return res.status(404).json({ error: true, message: 'techno non trouvée'});
+        }        
+        return res.status(200).json(techno);
+    });
+}); 
+
+app.post('/techno/:technoid/toggle_priority', (req, res) => {
+    const technoId = req.params.technoid;
+    Techno.findById(technoId, (err, techno)=>{
+        if(err) {
+            return res.status(404).send({ error: true, message: 'techno non trouvée'});
+        }
+        console.log('techno.isPrioritary', techno.isPrioritary);
+        techno.isPrioritary = !techno.isPrioritary;
+        techno.save();
+        return res.status(200).send({error: false, message: `techno ${techno._id} prioritaire est ${techno.isPrioritary}`});
+    });
+}); 
 
 app.post('/technos', (req, res) => {
 
     if (!req.body) {
         return res.sendStatus(500);
     } else {
-        var name = req.body.name;
-        var details = req.body.details;
-        var dateStudy = req.body.datestudy;
-        var dateCreation =  req.body.datecreation;        
-        var timeSpentStudying = req.body.timespentstudying;
+        let name = req.body.name;
+        let details = req.body.details;
+        let dateStudy = req.body.datestudy;
+        let dateCreation =  req.body.datecreation;        
+        let timeSpentStudying = req.body.timespentstudying;
+        let isPrioritary = req.body.isprioritary;
 
-        const myTechno = new Techno({ name, details, dateStudy, dateCreation, timeSpentStudying });
+        const myTechno = new Techno({ name, details, dateStudy, dateCreation, timeSpentStudying, isPrioritary });
 
         myTechno.save((err, savedTechno) => {
             if (err) {
