@@ -64,7 +64,7 @@ app.get('/techno/:technoid', (req, res) => {
     });
 }); 
 
-app.post('/techno/:technoid/toggle_priority', (req, res) => {
+app.get('/techno/:technoid/toggle_priority', (req, res) => {
     const technoId = req.params.technoid;
     Techno.findById(technoId, (err, techno)=>{
         if(err) {
